@@ -1,8 +1,4 @@
-# Welcome to your Convex + Next.js + Convex Auth app
 
-This is a [Convex](https://convex.dev/) project created with [`npm create convex`](https://www.npmjs.com/package/create-convex).
-
-After the initial setup (<2 minutes) you'll have a working full-stack app using:
 
 - Convex as your backend (database, server logic)
 - [React](https://react.dev/) as your frontend (web page interactivity)
