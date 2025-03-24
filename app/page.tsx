@@ -1,167 +1,20 @@
-"use client";
+import HeaderComponent from "../components/HeaderComponent";
+import FooterComponent from "../components/FooterComponent";
+import HeroComponent from "../components/home/HeroComponent";
+import HomeComponent from "@/components/home/HomeComponent";
 
-import { useState, useEffect, useRef } from "react";
-import { useQuery } from "convex/react";
-import { api } from "../convex/_generated/api";
-import { Id } from "../convex/_generated/dataModel";
 
-// Define the proper type for medicine data from the API
-interface MedicineData {
-  id: Id<"medicine_data">;
-  name: string;
-  category: string;
-  manufacturer: string;
-  mrp: number;
-}
-
-export default function Home() {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [suggestions, setSuggestions] = useState<MedicineData[]>([]);
-  const [isOpen, setIsOpen] = useState(false);
-  const [highlightedIndex, setHighlightedIndex] = useState(-1);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const suggestionsRef = useRef<HTMLDivElement>(null);
-
-  // Query medicine suggestions
-  const medicineResults = useQuery(api.medicine.searchMedicines, {
-    searchQuery: searchTerm,
-    limit: 10,
-  });
-
-  // Update suggestions when query results change
-  useEffect(() => {
-    if (medicineResults && searchTerm.trim() !== "") {
-      setSuggestions(medicineResults);
-      setIsOpen(true);
-    } else {
-      setSuggestions([]);
-      setIsOpen(false);
-    }
-  }, [medicineResults, searchTerm]);
-
-  // Handle keyboard navigation
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "ArrowDown") {
-      e.preventDefault();
-      setHighlightedIndex(prev => 
-        prev < suggestions.length - 1 ? prev + 1 : prev
-      );
-    } else if (e.key === "ArrowUp") {
-      e.preventDefault();
-      setHighlightedIndex(prev => (prev > 0 ? prev - 1 : prev));
-    } else if (e.key === "Enter" && highlightedIndex >= 0) {
-      e.preventDefault();
-      handleSuggestionClick(suggestions[highlightedIndex].name);
-    } else if (e.key === "Escape") {
-      setIsOpen(false);
-    }
-  };
-
-  // Handle outside click to close suggestions
-  useEffect(() => {
-    const handleClickOutside = (e: MouseEvent) => {
-      if (
-        suggestionsRef.current && 
-        !suggestionsRef.current.contains(e.target as Node) &&
-        !inputRef.current?.contains(e.target as Node)
-      ) {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
-  // Handle suggestion click
-  const handleSuggestionClick = (suggestion: string) => {
-    setSearchTerm(suggestion);
-    setIsOpen(false);
-    setHighlightedIndex(-1);
-  };
-
-  // Format price to currency
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'INR'
-    }).format(price);
-  };
-
+export default function Page() {
+  // Add any state or hooks you need here
+  
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gray-50">
-      <div className="w-full max-w-md">
-        <div className="relative">
-          <input
-            ref={inputRef}
-            type="text"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            onKeyDown={handleKeyDown}
-            onFocus={() => searchTerm.trim() !== "" && suggestions.length > 0 && setIsOpen(true)}
-            placeholder="Search medicines..."
-            className="w-full px-4 py-3 border rounded-lg shadow-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-lg"
-            autoComplete="off"
-            autoFocus
-          />
-          {searchTerm && (
-            <button 
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
-              onClick={() => setSearchTerm("")}
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-              </svg>
-            </button>
-          )}
-        </div>
-
-        {isOpen && suggestions.length > 0 && (
-          <div 
-            ref={suggestionsRef}
-            className="absolute z-10 mt-1 w-full max-w-md bg-white rounded-md shadow-lg max-h-60 overflow-auto border border-gray-200"
-          >
-            <ul className="py-1">
-              {suggestions.map((suggestion, index) => {
-                // Highlight matching parts of the suggestion
-                const parts = suggestion.name.split(new RegExp(`(${searchTerm})`, 'gi'));
-                
-                return (
-                  <li
-                    key={suggestion.id}
-                    onClick={() => handleSuggestionClick(suggestion.name)}
-                    className={`px-4 py-3 cursor-pointer hover:bg-gray-100 ${
-                      index === highlightedIndex ? "bg-blue-100" : ""
-                    }`}
-                  >
-                    <div className="flex justify-between items-center">
-                      <div>
-                        {parts.map((part, i) => (
-                          <span
-                            key={i}
-                            className={
-                              part.toLowerCase() === searchTerm.toLowerCase()
-                                ? "font-bold text-blue-600"
-                                : ""
-                            }
-                          >
-                            {part}
-                          </span>
-                        ))}
-                      </div>
-                      <div className="text-sm font-medium text-green-600">
-                        {formatPrice(suggestion.mrp)}
-                      </div>
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        )}
-      </div>
+    <div className="flex flex-col min-h-screen">
+      <HeaderComponent />
+      <main className="flex-grow">
+        <HeroComponent />
+        </main>
+        <HomeComponent /> 
+      <FooterComponent />
     </div>
   );
 }

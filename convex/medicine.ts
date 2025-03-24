@@ -13,7 +13,8 @@ export const searchMedicines = query({
       name: v.string(),
       category: v.string(),
       manufacturer: v.string(),
-      mrp: v.number()
+      mrp: v.number(),
+      discount: v.number()
     })
   ),
   handler: async (ctx, args) => {
@@ -38,7 +39,8 @@ export const searchMedicines = query({
       name: medicine.name,
       category: medicine.category,
       manufacturer: medicine.manufacturer,
-      mrp: medicine.mrp
+      mrp: medicine.mrp,
+      discount: medicine.discount
     }));
   },
 });
