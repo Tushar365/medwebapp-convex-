@@ -14,7 +14,9 @@
   "dependencies": {
     "@auth/core": "^0.37.0",
     "@convex-dev/auth": "^0.0.80",
+    "@types/lodash": "^4.17.16",
     "convex": "^1.21.0",
+    "lodash": "^4.17.21",
     "next": "15.2.3",
     "oslo": "^1.2.1",
     "react": "^19.0.0",
