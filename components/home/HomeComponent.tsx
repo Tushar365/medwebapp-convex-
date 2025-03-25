@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
+// Remove unused imports
+import React from 'react';
 
 export default function HomeComponent() {
   return (

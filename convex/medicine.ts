@@ -44,3 +44,12 @@ export const searchMedicines = query({
     }));
   },
 });
+
+// Add this function to your existing medicine.ts file
+
+export const getMedicineById = query({
+  args: { id: v.id("medicine_data") },
+  handler: async (ctx, args) => {
+    return await ctx.db.get(args.id);
+  },
+});

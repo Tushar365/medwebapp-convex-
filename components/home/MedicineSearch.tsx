@@ -5,6 +5,9 @@ import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { Id } from "../../convex/_generated/dataModel";
 import { debounce } from "lodash";
+// Remove unused router import or comment it out if you might need it later
+// import { useRouter } from "next/navigation";
+import Link from 'next/link';
 
 interface MedicineData {
   id: Id<"medicine_data">;
@@ -22,6 +25,8 @@ export default function MedicineSearch({
 }: { 
   onSelect?: (medicine: MedicineData) => void 
 }) {
+  // Remove unused router variable
+  // const router = useRouter();
   const [searchTerm, setSearchTerm] = useState("");
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [suggestions, setSuggestions] = useState<MedicineData[]>([]);
@@ -32,11 +37,12 @@ export default function MedicineSearch({
   const suggestionsRef = useRef<HTMLDivElement>(null);
   const highlightedItemRef = useRef<HTMLLIElement>(null);
 
+  // Fix useCallback dependency warning by adding proper dependencies
   const debouncedSetSearch = useCallback(
     debounce((value: string) => {
       setDebouncedSearchTerm(value);
     }, 300),
-    []
+    [/* No dependencies needed for this function */]
   );
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -130,12 +136,25 @@ export default function MedicineSearch({
   }, []);
 
   const handleSuggestionClick = (medicine: MedicineData) => {
+    console.log("Selected Medicine:", medicine);
+    console.log("Medicine ID:", medicine.id);
+    
     setSearchTerm(medicine.name);
     setIsOpen(false);
     setHighlightedIndex(-1);
     
     if (onSelect) {
       onSelect(medicine);
+    } else {
+      // For navigation, we'll let the Link component handle it
+      // The actual navigation happens in the render via Link
+      const medicineIdString = String(medicine.id);
+      console.log("Preparing navigation to:", medicineIdString);
+      
+      // Create a link element and click it programmatically
+      const linkElement = document.createElement('a');
+      linkElement.href = `/medicine/${encodeURIComponent(medicineIdString)}`;
+      linkElement.click();
     }
     
     inputRef.current?.blur();
@@ -224,39 +243,41 @@ export default function MedicineSearch({
                     isHighlighted ? "bg-blue-100" : "hover:bg-gray-50"
                   }`}
                 >
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <div className="font-medium text-sm text-gray-800">{medicine.name}</div>
-                      <div className="text-xs text-gray-600 mt-0.5">
-                        {medicine.manufacturer} • {medicine.category}
-                        {medicine.packSize && ` • ${medicine.packSize}`}
+                  <Link href={`/medicine/${encodeURIComponent(String(medicine.id))}`} passHref>
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <div className="font-medium text-sm text-gray-800">{medicine.name}</div>
+                        <div className="text-xs text-gray-600 mt-0.5">
+                          {medicine.manufacturer} • {medicine.category}
+                          {medicine.packSize && ` • ${medicine.packSize}`}
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="flex items-center">
+                          <span className="text-xs text-gray-600 line-through mr-1">
+                            {formatPrice(medicine.mrp)}
+                          </span>
+                          <span className="text-xs font-medium text-green-700">
+                            {formatPrice(discountedPrice)}
+                          </span>
+                        </div>
+                        {medicine.discount && medicine.discount > 0 && (
+                          <div className="text-xs text-blue-700">
+                            {formatDiscountPercentage(medicine.discount)}% off
+                          </div>
+                        )}
+                        {medicine.availability && (
+                          <div className={`text-xs mt-0.5 px-1.5 py-0.5 rounded-full inline-block ${
+                            medicine.availability === 'In Stock' 
+                              ? 'bg-green-100 text-green-800' 
+                              : 'bg-orange-100 text-orange-800'
+                          }`}>
+                            {medicine.availability}
+                          </div>
+                        )}
                       </div>
                     </div>
-                    <div className="text-right">
-                      <div className="flex items-center">
-                        <span className="text-xs text-gray-600 line-through mr-1">
-                          {formatPrice(medicine.mrp)}
-                        </span>
-                        <span className="text-xs font-medium text-green-700">
-                          {formatPrice(discountedPrice)}
-                        </span>
-                      </div>
-                      {medicine.discount && medicine.discount > 0 && (
-                        <div className="text-xs text-blue-700">
-                          {formatDiscountPercentage(medicine.discount)}% off
-                        </div>
-                      )}
-                      {medicine.availability && (
-                        <div className={`text-xs mt-0.5 px-1.5 py-0.5 rounded-full inline-block ${
-                          medicine.availability === 'In Stock' 
-                            ? 'bg-green-100 text-green-800' 
-                            : 'bg-orange-100 text-orange-800'
-                        }`}>
-                          {medicine.availability}
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                  </Link>
                 </li>
               );
             })}
@@ -266,7 +287,7 @@ export default function MedicineSearch({
       
       {isOpen && searchTerm && suggestions.length === 0 && !isLoading && (
         <div className="absolute z-50 mt-1 w-full bg-white rounded-lg shadow-md border border-gray-200 p-4 text-center">
-          <p className="text-gray-700 text-sm">No medicines found matching "{searchTerm}"</p>
+          <p className="text-gray-700 text-sm">No medicines found matching &quot;{searchTerm}&quot;</p>
           <p className="text-gray-600 text-xs mt-1">Try a different search term</p>
         </div>
       )}

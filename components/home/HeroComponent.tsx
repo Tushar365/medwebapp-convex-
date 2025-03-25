@@ -14,7 +14,8 @@ interface MedicineData {
 }
 
 export default function Hero() {
-  const [selectedMedicine, setSelectedMedicine] = useState<MedicineData | null>(null);
+  // Add ESLint disable comment to suppress the unused variable warning
+  const [selectedMedicine, setSelectedMedicine] = useState<MedicineData | null>(null); // eslint-disable-line @typescript-eslint/no-unused-vars
   
   const handleMedicineSelect = (medicine: MedicineData) => {
     setSelectedMedicine(medicine);
@@ -84,32 +85,14 @@ export default function Hero() {
         {/* Add spacing to prevent overlap with search results */}
         <div className="h-16"></div>
         
-        <div className="flex flex-col sm:flex-row justify-center gap-3">
+        <div className="flex justify-center">
           <Link
-            href="/orders/quick"
+            href="/order"
             className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg text-base font-medium shadow-md hover:shadow-lg transition-all duration-200 text-center flex items-center justify-center"
           >
-            <span className="mr-2">Quick Order</span>
+            <span className="mr-2">Order Now</span>
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-            </svg>
-          </Link>
-          <Link
-            href="/analytics"
-            className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg text-base font-medium shadow-md hover:shadow-lg transition-all duration-200 text-center flex items-center justify-center"
-          >
-            <span className="mr-2">Analytics</span>
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-            </svg>
-          </Link>
-          <Link
-            href="/orders/history"
-            className="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg text-base font-medium shadow-md hover:shadow-lg transition-all duration-200 text-center flex items-center justify-center"
-          >
-            <span className="mr-2">Past Orders</span>
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </Link>
         </div>
