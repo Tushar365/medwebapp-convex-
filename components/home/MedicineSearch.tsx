@@ -5,9 +5,21 @@ import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { Id } from "../../convex/_generated/dataModel";
 import { debounce } from "lodash";
-// Remove unused router import or comment it out if you might need it later
-// import { useRouter } from "next/navigation";
 import Link from 'next/link';
+import { 
+  TextField, 
+  InputAdornment, 
+  CircularProgress, 
+  List, 
+  ListItem, 
+  Typography, 
+  Paper, 
+  Box, 
+  IconButton,
+  Chip
+} from '@mui/material';
+import SearchIcon from '@mui/icons-material/Search';
+import CancelIcon from '@mui/icons-material/Cancel';
 
 interface MedicineData {
   id: Id<"medicine_data">;
@@ -15,9 +27,9 @@ interface MedicineData {
   category: string;
   manufacturer: string;
   mrp: number;
-  availability?: string;
-  packSize?: string;
-  discount?: number;
+  discount: number;
+  stock_quantity: number;
+  prescription_required: string;
 }
 
 export default function MedicineSearch({ 
@@ -185,112 +197,195 @@ export default function MedicineSearch({
   };
 
   return (
-    <div className="relative w-full medicine-search">
-      <div className="relative">
-        <input
-          ref={inputRef}
-          type="text"
-          value={searchTerm}
-          onChange={handleSearchChange}
-          onKeyDown={handleKeyDown}
-          onFocus={() => debouncedSearchTerm.trim() !== "" && suggestions.length > 0 && setIsOpen(true)}
-          placeholder="Search medicines..."
-          className="w-full pl-10 pr-10 py-2 border border-gray-300 rounded-full shadow-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500 outline-none text-gray-800"
-          autoComplete="off"
-        />
-        <div className="search-icon absolute inset-y-0 left-3 flex items-center pointer-events-none">
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-          </svg>
-        </div>
-        
-        {searchTerm && (
-          <button 
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 p-1"
-            onClick={clearSearch}
-            aria-label="Clear search"
-            type="button"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-            </svg>
-          </button>
-        )}
-        
-        {isLoading && searchTerm && (
-          <div className="absolute right-10 top-1/2 transform -translate-y-1/2">
-            <div className="animate-spin rounded-full h-3 w-3 border-b-2 border-blue-600"></div>
-          </div>
-        )}
-      </div>
+    <Box sx={{ position: 'relative', width: '100%' }}>
+      <TextField
+        inputRef={inputRef}
+        fullWidth
+        value={searchTerm}
+        onChange={handleSearchChange}
+        onKeyDown={handleKeyDown}
+        onFocus={() => debouncedSearchTerm.trim() !== "" && suggestions.length > 0 && setIsOpen(true)}
+        placeholder="Search medicines..."
+        variant="outlined"
+        size="medium"
+        InputProps={{
+          startAdornment: (
+            <InputAdornment position="start">
+              <SearchIcon color="action" />
+            </InputAdornment>
+          ),
+          endAdornment: (
+            <InputAdornment position="end">
+              {isLoading && searchTerm ? (
+                <CircularProgress size={20} />
+              ) : searchTerm ? (
+                <IconButton
+                  edge="end"
+                  onClick={clearSearch}
+                  aria-label="Clear search"
+                  size="small"
+                >
+                  <CancelIcon fontSize="small" />
+                </IconButton>
+              ) : null}
+            </InputAdornment>
+          ),
+          sx: {
+            borderRadius: '9999px',
+            bgcolor: 'rgba(255, 255, 255, 0.9)',
+            '& .MuiOutlinedInput-notchedOutline': {
+              borderColor: 'rgba(0, 0, 0, 0.1)'
+            }
+          }
+        }}
+      />
 
       {isOpen && suggestions.length > 0 && (
-        <div 
+        <Paper
           ref={suggestionsRef}
-          className="absolute z-50 mt-1 w-full bg-white rounded-lg shadow-md max-h-80 overflow-auto border border-gray-200 results-container"
+          elevation={4}
+          sx={{
+            position: 'absolute',
+            zIndex: 50,
+            mt: 1,
+            width: '100%',
+            maxHeight: 320,
+            overflow: 'auto',
+            borderRadius: 2,
+            bgcolor: 'rgba(255, 255, 255, 0.85)',
+            backdropFilter: 'blur(8px)',
+            border: '1px solid rgba(255, 255, 255, 0.3)'
+          }}
         >
-          <ul className="py-1 divide-y divide-gray-100">
+          <List disablePadding>
             {suggestions.map((medicine, index) => {
               const isHighlighted = index === highlightedIndex;
-              const discountedPrice = calculateDiscountedPrice(medicine.mrp, medicine.discount || 0);
+              const discountedPrice = calculateDiscountedPrice(medicine.mrp, medicine.discount);
+              
+              // Determine availability based on stock_quantity
+              const availability = medicine.stock_quantity > 0 ? 'In Stock' : 'Out of Stock';
               
               return (
-                <li
-                  ref={isHighlighted ? highlightedItemRef : null}
+                <ListItem
                   key={medicine.id}
                   onClick={() => handleSuggestionClick(medicine)}
-                  className={`px-3 py-2 cursor-pointer ${
-                    isHighlighted ? "bg-blue-100" : "hover:bg-gray-50"
-                  }`}
+                  disablePadding
+                  sx={{
+                    cursor: 'pointer',
+                    bgcolor: isHighlighted ? 'rgba(25, 118, 210, 0.1)' : 'transparent',
+                    '&:hover': {
+                      bgcolor: 'rgba(25, 118, 210, 0.08)'
+                    },
+                    borderBottom: '1px solid',
+                    borderColor: 'rgba(0, 0, 0, 0.08)'
+                  }}
+                  ref={isHighlighted ? highlightedItemRef : null}
                 >
-                  <Link href={`/medicine/${encodeURIComponent(String(medicine.id))}`} passHref>
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <div className="font-medium text-sm text-gray-800">{medicine.name}</div>
-                        <div className="text-xs text-gray-600 mt-0.5">
+                  <Box 
+                    component={Link}
+                    href={`/medicine/${encodeURIComponent(String(medicine.id))}`}
+                    sx={{ 
+                      width: '100%', 
+                      textDecoration: 'none', 
+                      color: 'text.primary',
+                      py: 1.5,
+                      px: 2
+                    }}
+                  >
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 2 }}>
+                      <Box sx={{ flex: 1, minWidth: 0 }}>
+                        <Typography 
+                          variant="subtitle2" 
+                          color="text.primary"
+                          sx={{ 
+                            fontWeight: 500,
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap'
+                          }}
+                        >
+                          {medicine.name}
+                        </Typography>
+                        <Typography 
+                          variant="caption" 
+                          color="text.secondary" 
+                          sx={{ 
+                            mt: 0.5,
+                            display: 'block',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            whiteSpace: 'nowrap'
+                          }}
+                        >
                           {medicine.manufacturer} • {medicine.category}
-                          {medicine.packSize && ` • ${medicine.packSize}`}
-                        </div>
-                      </div>
-                      <div className="text-right">
-                        <div className="flex items-center">
-                          <span className="text-xs text-gray-600 line-through mr-1">
+                          {medicine.prescription_required === "Yes" && " • Rx"}
+                        </Typography>
+                      </Box>
+                      <Box sx={{ textAlign: 'right', flexShrink: 0 }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+                          <Typography 
+                            variant="caption" 
+                            color="text.secondary" 
+                            sx={{ textDecoration: 'line-through', mr: 0.5 }}
+                          >
                             {formatPrice(medicine.mrp)}
-                          </span>
-                          <span className="text-xs font-medium text-green-700">
+                          </Typography>
+                          <Typography variant="body2" color="success.main" fontWeight="medium">
                             {formatPrice(discountedPrice)}
-                          </span>
-                        </div>
-                        {medicine.discount && medicine.discount > 0 && (
-                          <div className="text-xs text-blue-700">
+                          </Typography>
+                        </Box>
+                        {medicine.discount > 0 && (
+                          <Typography variant="caption" color="primary" sx={{ fontWeight: 500 }}>
                             {formatDiscountPercentage(medicine.discount)}% off
-                          </div>
+                          </Typography>
                         )}
-                        {medicine.availability && (
-                          <div className={`text-xs mt-0.5 px-1.5 py-0.5 rounded-full inline-block ${
-                            medicine.availability === 'In Stock' 
-                              ? 'bg-green-100 text-green-800' 
-                              : 'bg-orange-100 text-orange-800'
-                          }`}>
-                            {medicine.availability}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  </Link>
-                </li>
+                        <Box sx={{ mt: 0.5 }}>
+                          <Chip
+                            label={availability}
+                            size="small"
+                            color={medicine.stock_quantity > 0 ? 'success' : 'error'}
+                            sx={{ 
+                              height: 20, 
+                              fontSize: '0.625rem',
+                              '& .MuiChip-label': { px: 1 }
+                            }}
+                          />
+                        </Box>
+                      </Box>
+                    </Box>
+                  </Box>
+                </ListItem>
               );
             })}
-          </ul>
-        </div>
+          </List>
+        </Paper>
       )}
       
       {isOpen && searchTerm && suggestions.length === 0 && !isLoading && (
-        <div className="absolute z-50 mt-1 w-full bg-white rounded-lg shadow-md border border-gray-200 p-4 text-center">
-          <p className="text-gray-700 text-sm">No medicines found matching &quot;{searchTerm}&quot;</p>
-          <p className="text-gray-600 text-xs mt-1">Try a different search term</p>
-        </div>
+        <Paper 
+          elevation={4}
+          sx={{
+            position: 'absolute',
+            zIndex: 50,
+            mt: 1,
+            width: '100%',
+            p: 2,
+            textAlign: 'center',
+            borderRadius: 2,
+            bgcolor: 'rgba(255, 255, 255, 0.15)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(255, 255, 255, 0.2)',
+            color: 'white'
+          }}
+        >
+          <Typography variant="body2" color="inherit">
+            No medicines found matching "{searchTerm}"
+          </Typography>
+          <Typography variant="caption" color="rgba(255, 255, 255, 0.7)" sx={{ mt: 0.5, display: 'block' }}>
+            Try a different search term
+          </Typography>
+        </Paper>
       )}
-    </div>
+    </Box>
   );
 }

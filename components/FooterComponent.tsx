@@ -1,35 +1,69 @@
 "use client";
 
 import Link from 'next/link';
+import { Box, Container, Typography, Stack, Divider } from '@mui/material';
 
 export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-gray-100 mt-auto py-6">
-      <div className="container mx-auto px-4">
-        <div className="flex flex-col md:flex-row justify-between items-center">
-          <div className="mb-4 md:mb-0">
-            <h3 className="text-base font-medium text-gray-800">OsudhGhor</h3>
-            <p className="text-sm text-gray-600">
+    <Box component="footer" sx={{ bgcolor: '#f5f5f5', mt: 'auto', py: 4 }}>
+      <Container maxWidth="lg">
+        <Box sx={{ display: 'flex', flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'space-between', alignItems: { xs: 'center', md: 'flex-start' } }}>
+          <Box sx={{ mb: { xs: 2, md: 0 } }}>
+            <Typography variant="subtitle1" sx={{ fontWeight: 500, color: 'text.primary' }}>
+              OsudhGhor
+            </Typography>
+            <Typography variant="body2" sx={{ color: 'text.secondary' }}>
               Your trusted medicine partner
-            </p>
-          </div>
+            </Typography>
+          </Box>
           
-          <div className="flex flex-wrap gap-4 justify-center">
-            <Link href="/" className="text-sm text-gray-600 hover:text-blue-600">Home</Link>
-            <Link href="/orders" className="text-sm text-gray-600 hover:text-blue-600">Orders</Link>
-            <Link href="/analytics" className="text-sm text-gray-600 hover:text-blue-600">Analytics</Link>
-            <Link href="/help" className="text-sm text-gray-600 hover:text-blue-600">Help</Link>
-            <Link href="/terms" className="text-sm text-gray-600 hover:text-blue-600">Terms</Link>
-            <Link href="/privacy" className="text-sm text-gray-600 hover:text-blue-600">Privacy</Link>
-          </div>
-        </div>
+          <Stack direction="row" spacing={2} flexWrap="wrap" justifyContent="center">
+            <Link href="/" style={{ textDecoration: 'none' }}>
+              <Typography variant="body2" sx={{ color: 'text.secondary', '&:hover': { color: 'primary.main' } }}>
+                Home
+              </Typography>
+            </Link>
+            <Link href="/orders" style={{ textDecoration: 'none' }}>
+              <Typography variant="body2" sx={{ color: 'text.secondary', '&:hover': { color: 'primary.main' } }}>
+                Orders
+              </Typography>
+            </Link>
+            <Link href="/draft" style={{ textDecoration: 'none' }}>
+              <Typography variant="body2" sx={{ color: 'text.secondary', '&:hover': { color: 'primary.main' } }}>
+                Draft
+              </Typography>
+            </Link>
+            <Link href="/account" style={{ textDecoration: 'none' }}>
+              <Typography variant="body2" sx={{ color: 'text.secondary', '&:hover': { color: 'primary.main' } }}>
+                Account
+              </Typography>
+            </Link>
+            <Link href="/help" style={{ textDecoration: 'none' }}>
+              <Typography variant="body2" sx={{ color: 'text.secondary', '&:hover': { color: 'primary.main' } }}>
+                Help
+              </Typography>
+            </Link>
+            <Link href="/terms" style={{ textDecoration: 'none' }}>
+              <Typography variant="body2" sx={{ color: 'text.secondary', '&:hover': { color: 'primary.main' } }}>
+                Terms
+              </Typography>
+            </Link>
+            <Link href="/privacy" style={{ textDecoration: 'none' }}>
+              <Typography variant="body2" sx={{ color: 'text.secondary', '&:hover': { color: 'primary.main' } }}>
+                Privacy
+              </Typography>
+            </Link>
+          </Stack>
+        </Box>
         
-        <div className="border-t border-gray-200 mt-6 pt-6 text-center text-sm text-gray-600">
-          <p>&copy; {currentYear} OsudhGhor. All rights reserved.</p>
-        </div>
-      </div>
-    </footer>
+        <Divider sx={{ my: 3 }} />
+        
+        <Typography variant="body2" sx={{ color: 'text.secondary', textAlign: 'center' }}>
+          &copy; {currentYear} OsudhGhor. All rights reserved.
+        </Typography>
+      </Container>
+    </Box>
   );
 }

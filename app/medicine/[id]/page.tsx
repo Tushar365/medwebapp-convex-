@@ -4,7 +4,7 @@
 import MedicineDetailInner from './inner';
 import Header from '@/components/HeaderComponent';
 import Footer from '@/components/FooterComponent';
-import BrandPromise from '@/components/medicine_page';
+import BrandPromise from '@/components/MedicinePage';
 import { Suspense} from 'react';
 import { useParams } from 'next/navigation';
 

@@ -2,6 +2,24 @@
 
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
+import { 
+  AppBar, 
+  Toolbar, 
+  Typography, 
+  Button, 
+  IconButton, 
+  Drawer, 
+  List, 
+  ListItem, 
+  ListItemText, 
+  Box, 
+  Container 
+} from '@mui/material';
+import MenuIcon from '@mui/icons-material/Menu';
+import LocalPharmacyIcon from '@mui/icons-material/LocalPharmacy';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import DescriptionIcon from '@mui/icons-material/Description';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -19,63 +37,140 @@ export default function Header() {
     };
   }, []);
 
+  const toggleMenu = () => {
+    setIsMenuOpen(!isMenuOpen);
+  };
+
   return (
-    <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-200 ${
-      scrolled 
-        ? 'bg-white shadow-md' 
-        : 'bg-white'
-    }`}>
-      <div className="container mx-auto px-4 py-2 flex items-center justify-between">
-        <div className="flex items-center">
-          <Link href="/" className="text-xl font-semibold text-blue-600 flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-            </svg>
-            OsudhGhor
-          </Link>
-        </div>
-
-        {/* Desktop Navigation */}
-        <nav className="hidden md:flex items-center space-x-4">
-          <Link href="/" className="text-gray-700 hover:text-blue-600">
-            Home
-          </Link>
-          <Link href="/orders" className="text-gray-700 hover:text-blue-600">
-            Orders
-          </Link>
-          <Link href="/analytics" className="text-gray-700 hover:text-blue-600">
-            Analytics
-          </Link>
-        </nav>
-
-        {/* Mobile Menu Button */}
-        <button 
-          className="md:hidden p-1.5 rounded-md text-gray-700 hover:bg-gray-100 focus:outline-none"
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
-          aria-label="Toggle menu"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-          </svg>
-        </button>
-      </div>
-
-      {/* Mobile Menu */}
-      {isMenuOpen && (
-        <div className="md:hidden px-4 py-2 bg-white shadow-sm border-t">
-          <nav className="flex flex-col space-y-2 pb-2">
-            <Link href="/" className="text-gray-700 hover:text-blue-600 py-1.5">
-              Home
+    <AppBar 
+      position="fixed" 
+      elevation={scrolled ? 4 : 0}
+      sx={{ 
+        backgroundColor: 'white', 
+        transition: 'all 0.3s',
+        boxShadow: scrolled ? '0px 2px 10px rgba(0, 0, 0, 0.1)' : 'none'
+      }}
+    >
+      <Container maxWidth="lg">
+        <Toolbar sx={{ py: 0.5 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
+            <Link href="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
+              <Box 
+                component="img"
+                src="/icons8-pharmacy-shop-96.png"
+                alt="OsudhGhor Logo"
+                sx={{ 
+                  height: 32, 
+                  width: 32, 
+                  mr: 1 
+                }}
+              />
+              <Typography variant="h6" component="div" sx={{ fontWeight: 600, color: '#1976d2' }}>
+                OsudhGhor
+              </Typography>
             </Link>
-            <Link href="/orders" className="text-gray-700 hover:text-blue-600 py-1.5">
+          </Box>
+
+          {/* Desktop Navigation */}
+          <Box sx={{ display: { xs: 'none', md: 'flex' }, gap: 2 }}>
+            <Button 
+              component={Link} 
+              href="/order" 
+              color="primary"
+              variant="contained"
+              sx={{ fontWeight: 'medium' }}
+            >
+              Order Now
+            </Button>
+            <Button 
+              component={Link} 
+              href="/orders" 
+              color="inherit"
+              startIcon={<ShoppingCartIcon />}
+              sx={{ color: 'text.primary', '&:hover': { color: '#1976d2' } }}
+            >
               Orders
-            </Link>
-            <Link href="/analytics" className="text-gray-700 hover:text-blue-600 py-1.5">
-              Analytics
-            </Link>
-          </nav>
-        </div>
-      )}
-    </header>
+            </Button>
+            <Button 
+              component={Link} 
+              href="/draft" 
+              color="inherit"
+              startIcon={<DescriptionIcon />}
+              sx={{ color: 'text.primary', '&:hover': { color: '#1976d2' } }}
+            >
+              Draft
+            </Button>
+            <Button 
+              component={Link} 
+              href="/account" 
+              color="inherit"
+              startIcon={<AccountCircleIcon />}
+              sx={{ color: 'text.primary', '&:hover': { color: '#1976d2' } }}
+            >
+              Account
+            </Button>
+          </Box>
+
+          {/* Mobile Menu Button */}
+          <IconButton
+            edge="end"
+            color="inherit"
+            aria-label="menu"
+            onClick={toggleMenu}
+            sx={{ display: { xs: 'flex', md: 'none' }, color: 'text.primary' }}
+          >
+            <MenuIcon />
+          </IconButton>
+        </Toolbar>
+      </Container>
+
+      {/* Mobile Menu Drawer */}
+      <Drawer
+        anchor="right"
+        open={isMenuOpen}
+        onClose={toggleMenu}
+      >
+        <Box sx={{ width: 250, pt: 2 }} role="presentation" onClick={toggleMenu}>
+          <List>
+            <ListItem 
+              component={Link} 
+              href="/order"
+              sx={{ 
+                '&:hover': { backgroundColor: 'rgba(25, 118, 210, 0.08)' },
+                backgroundColor: 'primary.main',
+                color: 'white',
+                mb: 1
+              }}
+            >
+              <ListItemText primary="Order Now" />
+            </ListItem>
+            <ListItem 
+              component={Link} 
+              href="/orders"
+              sx={{ '&:hover': { backgroundColor: 'rgba(25, 118, 210, 0.08)' } }}
+            >
+              <ShoppingCartIcon sx={{ mr: 2, fontSize: '1.2rem', color: 'text.secondary' }} />
+              <ListItemText primary="Orders" />
+            </ListItem>
+            <ListItem 
+              component={Link} 
+              href="/draft"
+              sx={{ '&:hover': { backgroundColor: 'rgba(25, 118, 210, 0.08)' } }}
+            >
+              <DescriptionIcon sx={{ mr: 2, fontSize: '1.2rem', color: 'text.secondary' }} />
+              <ListItemText primary="Draft" />
+            </ListItem>
+            <ListItem 
+              component={Link} 
+              href="/account"
+              sx={{ '&:hover': { backgroundColor: 'rgba(25, 118, 210, 0.08)' } }}
+            >
+              <AccountCircleIcon sx={{ mr: 2, fontSize: '1.2rem', color: 'text.secondary' }} />
+              <ListItemText primary="Account" />
+            </ListItem>
+          </List>
+        </Box>
+      </Drawer>
+    </AppBar>
   );
 }
