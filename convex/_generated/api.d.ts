@@ -13,8 +13,6 @@ import type {
   FilterApi,
   FunctionReference,
 } from "convex/server";
-import type * as auth from "../auth.js";
-import type * as http from "../http.js";
 import type * as medicine from "../medicine.js";
 import type * as myFunctions from "../myFunctions.js";
 import type * as ResendProvider from "../ResendProvider.js";
@@ -28,8 +26,6 @@ import type * as ResendProvider from "../ResendProvider.js";
  * ```
  */
 declare const fullApi: ApiFromModules<{
-  auth: typeof auth;
-  http: typeof http;
   medicine: typeof medicine;
   myFunctions: typeof myFunctions;
   ResendProvider: typeof ResendProvider;
